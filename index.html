@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile Security Scanner — Demo AT-HTTT Nhóm 14</title>
+
+  <!-- Google Fonts: IBM Plex Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header">
+    <div class="app-logo">
+      <!-- Smartphone icon -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="2" width="14" height="20" rx="2"/>
+        <line x1="9" y1="18" x2="15" y2="18"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Mobile Security Scanner</h1>
+      <p>Phân tích bảo mật thiết bị di động — Demo báo cáo AT-HTTT Nhóm 14</p>
+    </div>
+  </header>
+
+  <!-- ===== CHỌN THIẾT BỊ ===== -->
+  <!--
+    Mỗi nút gọi selectDevice(this, 'key')
+    'key' phải khớp với key trong object DEVICES (data/devices.js)
+  -->
+  <div class="device-row">
+    <button
+      class="device-btn active"
+      onclick="selectDevice(this, 'medium')"
+    >
+      <div class="db-name">Samsung Galaxy A55</div>
+      <div class="db-os">Android 14 · BYOD</div>
+    </button>
+
+    <button
+      class="device-btn"
+      onclick="selectDevice(this, 'high')"
+    >
+      <div class="db-name">iPhone 15 Pro</div>
+      <div class="db-os">iOS 17.4 · BYOD</div>
+    </button>
+
+    <button
+      class="device-btn"
+      onclick="selectDevice(this, 'low')"
+    >
+      <div class="db-name">Xiaomi Redmi 12</div>
+      <div class="db-os">Android 13 · Unmanaged</div>
+    </button>
+  </div>
+
+  <!-- ===== SCANNING OVERLAY ===== -->
+  <!-- Hiện khi đang chạy animation quét, ẩn khi xong -->
+  <div class="scanning-overlay" id="scanning-overlay">
+    <div class="scan-dots">
+      <div class="scan-dot"></div>
+      <div class="scan-dot"></div>
+      <div class="scan-dot"></div>
+    </div>
+    <p class="scan-status" id="scan-status">Đang quét thiết bị...</p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- ===== KẾT QUẢ ===== -->
+  <div class="result-area" id="result-area">
+
+    <!-- Thẻ điểm tổng -->
+    <div class="score-card">
+      <div class="score-circle-wrap">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <!-- Vòng nền xám -->
+          <circle
+            cx="50" cy="50" r="40"
+            fill="none"
+            stroke="rgba(0,0,0,0.08)"
+            stroke-width="8"
+          />
+          <!-- Vòng điểm — stroke-dashoffset được cập nhật bởi JS -->
+          <circle
+            id="score-arc"
+            cx="50" cy="50" r="40"
+            fill="none"
+            stroke="#185FA5"
+            stroke-width="8"
+            stroke-linecap="round"
+            stroke-dasharray="251.2"
+            stroke-dashoffset="75"
+          />
+        </svg>
+        <div class="score-overlay">
+          <span class="score-number" id="score-number">70</span>
+          <span class="score-label">/ 100</span>
+        </div>
+      </div>
+
+      <div class="score-meta">
+        <h2 id="score-title">Mức độ bảo mật: Trung bình</h2>
+        <p id="score-desc">
+          Thiết bị có một số rủi ro cần khắc phục. Khuyến nghị bật mã hóa
+          toàn bộ ổ đĩa và cập nhật hệ điều hành sớm nhất có thể.
+        </p>
+        <span class="risk-badge" id="risk-badge">Rủi ro trung bình</span>
+      </div>
+    </div>
+
+    <!-- Lưới 8 thẻ tiêu chí — được tạo động bởi JS -->
+    <div class="checks-grid" id="checks-grid"></div>
+
+    <!-- Nút hành động -->
+    <div class="actions-row">
+      <button class="btn primary" onclick="runScan()">
+        &#x21BA; Quét lại
+      </button>
+      <button class="btn" onclick="toggleLog()">
+        Xem log chi tiết
+      </button>
+    </div>
+
+    <!-- Terminal log -->
+    <div class="log-panel" id="log-panel"></div>
+
+  </div><!-- /.result-area -->
+
+</div><!-- /.app-shell -->
+
+<!-- ===== SCRIPTS ===== -->
+<!-- Tải data trước, sau đó mới tải logic -->
+<script src="data/devices.js"></script>
+<script src="js/scanner.js"></script>
+
+</body>
+</html>
