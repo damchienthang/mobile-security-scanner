@@ -444,3 +444,75 @@ body {
 .log-line.warn { color: var(--amber); }
 .log-line.fail { color: var(--red); }
 .log-line.info { color: var(--text-muted); }
+
+/* ---- Attack Simulation Panel ---- */
+
+.attack-simulation-panel h3 {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.attack-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-attack {
+  background: var(--surface);
+  border-color: var(--border-md);
+  color: var(--text);
+}
+
+.btn-attack:hover {
+  background: var(--red-light);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ---- Toast Notifications (Cảnh báo nổi) ---- */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.toast {
+  min-width: 300px;
+  max-width: 400px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease forwards;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.toast.fail { background: var(--red); }
+.toast.pass { background: var(--green); }
+.toast.warn { background: var(--amber); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(10px); }
+}
