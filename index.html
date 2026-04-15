@@ -133,6 +133,21 @@
       <button class="btn" onclick="toggleLog()">
         Xem log chi tiết
       </button>
+      <div class="attack-simulation-panel" id="attack-panel">
+      <h3>🚨 Mô phỏng tấn công thời gian thực</h3>
+      <div class="attack-buttons">
+        <button class="btn btn-attack" onclick="simulateAttack('mitm')">
+          Tấn công MITM (Wi-Fi giả mạo)
+        </button>
+        <button class="btn btn-attack" onclick="simulateAttack('phishing')">
+          Gửi SMS Phishing
+        </button>
+        <button class="btn btn-attack" onclick="simulateAttack('malware')">
+          Kích hoạt Mã độc ẩn
+        </button>
+      </div>
+    </div>
+    <div id="toast-container"></div>
     </div>
 
     <!-- Terminal log -->
