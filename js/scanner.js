@@ -186,6 +186,113 @@ function escapeHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
+// ==========================================
+// KHU VỰC LOGIC MÔ PHỎNG TẤN CÔNG (ATTACK SIMULATION)
+// ==========================================
 
+function simulateAttack(attackType) {
+  if (scanning) return; // Không cho phép ấn tấn công khi đang quét
+
+  let status = '', title = '', message = '';
+
+  // Dựa vào thiết bị đang chọn để đưa ra kết quả tương ứng
+  switch (attackType) {
+    case 'mitm':
+      if (currentDevice === 'high') {
+        status = 'pass';
+        title = '🛡️ Đã chặn MITM (Man-in-the-Middle)';
+        message = 'Kẻ tấn công tạo Wi-Fi giả. Nhưng VPN Always-on và Certificate Pinning trên iPhone đã mã hóa toàn bộ dữ liệu. Tấn công vô hiệu.';
+      } else if (currentDevice === 'medium') {
+        status = 'warn';
+        title = '⚠️ Cảnh báo kết nối không an toàn';
+        message = 'Phát hiện chứng chỉ Wi-Fi lạ. Hệ thống VPN đang cố gắng thiết lập lại kết nối. Người dùng tạm thời bị ngắt mạng.';
+      } else {
+        status = 'fail';
+        title = '🚨 BỊ HACK: Đánh cắp phiên đăng nhập';
+        message = 'Xiaomi kết nối vào Wi-Fi giả mà không có VPN. Kẻ tấn công đã bắt được gói tin HTTP và đánh cắp Session Cookie!';
+      }
+      break;
+
+    case 'phishing':
+      if (currentDevice === 'high') {
+        status = 'pass';
+        title = '🛡️ Phishing thất bại (Nhờ Passkey)';
+        message = 'Người dùng lỡ bấm vào link giả. Nhưng Passkey (FIDO2) từ chối xác thực vì sai tên miền (Domain Mismatch). Tài khoản an toàn.';
+      } else if (currentDevice === 'medium') {
+        status = 'warn';
+        title = '⚠️ Lộ mật khẩu nhưng MFA chặn lại';
+        message = 'Người dùng nhập mật khẩu vào web giả. Kẻ tấn công có mật khẩu nhưng không thể đăng nhập vì thiếu mã Authenticator (MFA).';
+      } else {
+        status = 'fail';
+        title = '🚨 BỊ HACK: Mất quyền kiểm soát email';
+        message = 'Người dùng nhập mật khẩu vào web giả. Do KHÔNG CÓ MFA, kẻ tấn công lập tức đăng nhập thành công vào email công ty!';
+      }
+      break;
+
+    case 'malware':
+      if (currentDevice === 'high') {
+        status = 'pass';
+        title = '🛡️ Mã độc bị cô lập (Sandbox)';
+        message = 'Mã độc cố đọc clipboard. iOS App Sandbox chặn đứng hành vi này. Dữ liệu không thể lọt ra ngoài.';
+      } else if (currentDevice === 'medium') {
+        status = 'pass';
+        title = '🛡️ MDM Intune can thiệp';
+        message = 'Intune phát hiện hành vi app bất thường. Container công việc (Work Profile) tự động bị khóa để bảo vệ dữ liệu doanh nghiệp.';
+      } else {
+        status = 'fail';
+        title = '🚨 BỊ HACK: Rò rỉ dữ liệu (Data Leak)';
+        message = 'Mã độc Triada chạy ngầm. Do máy KHÔNG mã hóa ổ đĩa, nó đã đọc trộm toàn bộ file tài liệu và gửi về server của Hacker.';
+      }
+      break;
+  }
+
+  // 1. Hiển thị thông báo nổi
+  showToast(status, title, message);
+
+  // 2. Ghi log vào Terminal
+  addLogLine(status, attackType, title, message);
+}
+
+// Hàm tạo thông báo nổi góc dưới
+function showToast(status, title, message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${status}`;
+  toast.innerHTML = `
+    <span class="toast-title">${title}</span>
+    <span>${message}</span>
+  `;
+
+  container.appendChild(toast);
+
+  // Tự động xóa sau 5 giây
+  setTimeout(() => {
+    toast.style.animation = 'fadeOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300); // Đợi animation chạy xong mới xóa DOM
+  }, 5000);
+}
+
+// Hàm thêm dòng log vào terminal động
+function addLogLine(status, attackType, title, message) {
+  const logPanel = document.getElementById('log-panel');
+  const time = new Date().toLocaleTimeString('vi-VN');
+  
+  // Mapping class của CSS
+  const clsMap = { 'pass': 'ok', 'warn': 'warn', 'fail': 'fail' };
+  
+  const line = document.createElement('div');
+  line.className = `log-line ${clsMap[status]}`;
+  
+  // Format: [Thời gian] FAIL - TẤN CÔNG PHISHING: Chi tiết...
+  line.textContent = `[${time}] ${status.toUpperCase()} - [TẤN CÔNG ${attackType.toUpperCase()}] ${title}: ${message}`;
+  
+  // Thêm vào cuối cùng
+  logPanel.appendChild(line);
+  
+  // Nếu log đang hiện, tự động cuộn xuống dòng mới nhất
+  if (logVisible) {
+    logPanel.scrollTop = logPanel.scrollHeight;
+  }
+}
 // ---- Khởi chạy lần đầu ----
 renderResult(currentDevice);
