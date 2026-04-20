@@ -1,126 +1,546 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mobile Security Scanner — Demo AT-HTTT Nhóm 14</title>
 
-  <!-- Google Fonts: IBM Plex Sans + IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;600&display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- Stylesheet -->
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ===== TAB NAVIGATION ===== */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 5px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .tab-badge {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 1px 6px;
+      border-radius: 99px;
+    }
+
+    .tab-btn:not(.active) .tab-badge {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ===== RSA DEMO ===== */
+    .crypto-section {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .crypto-section h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    #rsa-canvas {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      margin-bottom: 10px;
+      min-height: 130px;
+      overflow: hidden;
+    }
+
+    #rsa-progress {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rsa-step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-md);
+      transition: background 0.3s, transform 0.2s;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .rsa-step-dot.done {
+      background: var(--green);
+    }
+
+    .rsa-step-dot.active {
+      background: var(--blue);
+      transform: scale(1.4);
+    }
+
+    #rsa-detail {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      padding: 12px 14px;
+      min-height: 80px;
+      margin-bottom: 10px;
+    }
+
+    .rsa-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rsa-controls .btn {
+      flex: 1;
+    }
+
+    /* ===== MFA DEMO ===== */
+    #mfa-type-select {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .mfa-type-btn {
+      flex: 1;
+      min-width: 130px;
+      padding: 12px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      cursor: pointer;
+      text-align: center;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .mfa-type-btn:hover {
+      background: var(--surface);
+      border-color: var(--blue);
+    }
+
+    .mfa-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mfa-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .mfa-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ===== CONCEPT CARDS ===== */
+    .concept-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 560px) {
+      .concept-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .concept-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .cc-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .cc-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .cc-body {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .cc-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    @keyframes flowAnim {
+      from {
+        opacity: 0;
+        transform: scaleX(0.3);
+      }
+
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="app-shell">
+  <div class="app-shell">
 
-  <!-- ===== HEADER ===== -->
-  <header class="app-header">
-    <div class="app-logo">
-      <!-- Smartphone icon -->
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="5" y="2" width="14" height="20" rx="2"/>
-        <line x1="9" y1="18" x2="15" y2="18"/>
-      </svg>
-    </div>
-    <div>
-      <h1>Mobile Security Scanner</h1>
-      <p>Phân tích bảo mật thiết bị di động — Demo báo cáo AT-HTTT Nhóm 14</p>
-    </div>
-  </header>
-
-  <!-- ===== CHỌN THIẾT BỊ ===== -->
-  <!--
-    Mỗi nút gọi selectDevice(this, 'key')
-    'key' phải khớp với key trong object DEVICES (data/devices.js)
-  -->
-  <div class="device-row">
-    <button
-      class="device-btn active"
-      onclick="selectDevice(this, 'medium')"
-    >
-      <div class="db-name">Samsung Galaxy A55</div>
-      <div class="db-os">Android 14 · BYOD</div>
-    </button>
-
-    <button
-      class="device-btn"
-      onclick="selectDevice(this, 'high')"
-    >
-      <div class="db-name">iPhone 15 Pro</div>
-      <div class="db-os">iOS 17.4 · BYOD</div>
-    </button>
-
-    <button
-      class="device-btn"
-      onclick="selectDevice(this, 'low')"
-    >
-      <div class="db-name">Xiaomi Redmi 12</div>
-      <div class="db-os">Android 13 · Unmanaged</div>
-    </button>
-  </div>
-
-  <!-- ===== SCANNING OVERLAY ===== -->
-  <!-- Hiện khi đang chạy animation quét, ẩn khi xong -->
-  <div class="scanning-overlay" id="scanning-overlay">
-    <div class="scan-dots">
-      <div class="scan-dot"></div>
-      <div class="scan-dot"></div>
-      <div class="scan-dot"></div>
-    </div>
-    <p class="scan-status" id="scan-status">Đang quét thiết bị...</p>
-    <div class="progress-track">
-      <div class="progress-fill" id="progress-fill"></div>
-    </div>
-  </div>
-
-  <!-- ===== KẾT QUẢ ===== -->
-  <div class="result-area" id="result-area">
-
-    <!-- Thẻ điểm tổng -->
-    <div class="score-card">
-      <div class="score-circle-wrap">
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <!-- Vòng nền xám -->
-          <circle
-            cx="50" cy="50" r="40"
-            fill="none"
-            stroke="rgba(0,0,0,0.08)"
-            stroke-width="8"
-          />
-          <!-- Vòng điểm — stroke-dashoffset được cập nhật bởi JS -->
-          <circle
-            id="score-arc"
-            cx="50" cy="50" r="40"
-            fill="none"
-            stroke="#185FA5"
-            stroke-width="8"
-            stroke-linecap="round"
-            stroke-dasharray="251.2"
-            stroke-dashoffset="75"
-          />
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+      <div class="app-logo">
+        <!-- Smartphone icon -->
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="2" width="14" height="20" rx="2" />
+          <line x1="9" y1="18" x2="15" y2="18" />
         </svg>
-        <div class="score-overlay">
-          <span class="score-number" id="score-number">70</span>
-          <span class="score-label">/ 100</span>
+      </div>
+      <div>
+        <h1>Mobile Security Scanner</h1>
+        <p>Phân tích bảo mật thiết bị di động — Demo báo cáo AT-HTTT Nhóm 14</p>
+      </div>
+    </header>
+
+
+    <!-- TAB NAV -->
+    <nav class="tab-nav" role="tablist">
+      <button class="tab-btn active" role="tab" onclick="switchTab('scanner', this)">
+        📱 Security Scanner
+        <span class="tab-badge">Chương 2</span>
+      </button>
+      <button class="tab-btn" role="tab" onclick="switchTab('crypto', this)">
+        🛡️ Bảo mật di động
+        <span class="tab-badge">Chương 3</span>
+      </button>
+    </nav>
+
+    <!-- ============================================================
+            TAB 1: SECURITY SCANNER
+            ============================================================ -->
+    <div id="tab-scanner" class="tab-panel active">       
+      <div class="device-row">
+        <button class="device-btn active" onclick="selectDevice(this, 'medium')">
+          <div class="db-name">Samsung Galaxy A55</div>
+          <div class="db-os">Android 14 · BYOD</div>
+        </button>
+
+        <button class="device-btn" onclick="selectDevice(this, 'high')">
+          <div class="db-name">iPhone 15 Pro</div>
+          <div class="db-os">iOS 17.4 · BYOD</div>
+        </button>
+
+        <button class="device-btn" onclick="selectDevice(this, 'low')">
+          <div class="db-name">Xiaomi Redmi 12</div>
+          <div class="db-os">Android 13 · Unmanaged</div>
+        </button>
+      </div>
+
+      <!-- ===== SCANNING OVERLAY ===== -->
+      <!-- Hiện khi đang chạy animation quét, ẩn khi xong -->
+      <div class="scanning-overlay" id="scanning-overlay">
+        <div class="scan-dots">
+          <div class="scan-dot"></div>
+          <div class="scan-dot"></div>
+          <div class="scan-dot"></div>
+        </div>
+        <p class="scan-status" id="scan-status">Đang quét thiết bị...</p>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
       </div>
 
-      <div class="score-meta">
-        <h2 id="score-title">Mức độ bảo mật: Trung bình</h2>
-        <p id="score-desc">
-          Thiết bị có một số rủi ro cần khắc phục. Khuyến nghị bật mã hóa
-          toàn bộ ổ đĩa và cập nhật hệ điều hành sớm nhất có thể.
-        </p>
-        <span class="risk-badge" id="risk-badge">Rủi ro trung bình</span>
+      <!-- ===== KẾT QUẢ ===== -->
+      <div class="result-area" id="result-area">
+
+        <!-- Thẻ điểm tổng -->
+        <div class="score-card">
+          <div class="score-circle-wrap">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <!-- Vòng nền xám -->
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="8" />
+              <!-- Vòng điểm — stroke-dashoffset được cập nhật bởi JS -->
+              <circle id="score-arc" cx="50" cy="50" r="40" fill="none" stroke="#185FA5" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="75" />
+            </svg>
+            <div class="score-overlay">
+              <span class="score-number" id="score-number">70</span>
+              <span class="score-label">/ 100</span>
+            </div>
+          </div>
+
+          <div class="score-meta">
+            <h2 id="score-title">Mức độ bảo mật: Trung bình</h2>
+            <p id="score-desc">
+              Thiết bị có một số rủi ro cần khắc phục. Khuyến nghị bật mã hóa
+              toàn bộ ổ đĩa và cập nhật hệ điều hành sớm nhất có thể.
+            </p>
+            <span class="risk-badge" id="risk-badge">Rủi ro trung bình</span>
+          </div>
+        </div>
+
+        <!-- Lưới 8 thẻ tiêu chí — được tạo động bởi JS -->
+        <div class="checks-grid" id="checks-grid"></div>
+
+        <!-- Nút hành động -->
+        <div class="actions-row">
+          <button class="btn primary" onclick="runScan()">
+            &#x21BA; Quét lại
+          </button>
+          <button class="btn" onclick="toggleLog()">
+            Xem log chi tiết
+          </button>
+          <div class="attack-simulation-panel" id="attack-panel">
+            <h3>🚨 Mô phỏng tấn công thời gian thực</h3>
+            <div class="attack-buttons">
+              <button class="btn btn-attack" onclick="simulateAttack('mitm')">
+                Tấn công MITM (Wi-Fi giả mạo)
+              </button>
+              <button class="btn btn-attack" onclick="simulateAttack('phishing')">
+                Gửi SMS Phishing
+              </button>
+              <button class="btn btn-attack" onclick="simulateAttack('malware')">
+                Kích hoạt Mã độc ẩn
+              </button>
+            </div>
+          </div>
+          <div id="toast-container"></div>
+        </div>
+
+        <!-- Terminal log -->
+        <div class="log-panel" id="log-panel"></div>
+
+      </div><!-- /.result-area -->
+
+    </div><!-- /.app-shell -->
+
+  <!-- ============================================================
+          TAB 2: MÃ HÓA & XÁC THỰC
+          ============================================================ -->
+  <div id="tab-crypto" class="tab-panel">
+  
+    <!-- 4-Layer Security Architecture Diagram -->
+    <div class="crypto-section">
+      <h3>🏛️ Kiến trúc bảo mật đa lớp (BMDL)</h3>
+      <p class="section-sub">4 lớp phòng thủ xếp chồng trên thiết bị di động — phá vỡ lớp ngoài không có nghĩa là thâm
+        nhập được lớp trong</p>
+      <svg width="100%" viewBox="0 0 680 540" role="img" style="display:block">
+        <title>Kiến trúc bảo mật đa lớp</title>
+        <desc>4 lớp bảo mật: TEE, Sandbox, mã hóa, quản lý quyền</desc>
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </marker>
+        </defs>
+        <!-- Lớp 4: App Permissions -->
+        <rect x="40" y="28" width="560" height="468" rx="20" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#085041" x="72" y="60"
+          dominant-baseline="central">Lớp 4 — Quản lý quyền ứng dụng (App Permissions)</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#0F6E56" x="72" y="80"
+          dominant-baseline="central">Runtime permission · người dùng kiểm soát camera, mic, GPS, danh bạ</text>
+  
+        <!-- Lớp 3: Data Encryption -->
+        <rect x="70" y="102" width="500" height="364" rx="16" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#0C447C" x="102" y="132"
+          dominant-baseline="central">Lớp 3 — Mã hóa dữ liệu (AES-256 / FBE)</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#185FA5" x="102" y="150"
+          dominant-baseline="central">File-Based Encryption · mỗi file một khóa riêng · bảo vệ khi mất thiết bị</text>
+  
+        <!-- Lớp 2: Sandbox -->
+        <rect x="100" y="172" width="440" height="264" rx="14" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#26215C" x="132" y="200"
+          dominant-baseline="central">Lớp 2 — Application Sandbox</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#3C3489" x="132" y="218"
+          dominant-baseline="central">UID isolation · kernel enforcement · Work Profile · ngăn lây nhiễm chéo</text>
+  
+        <!-- Lớp 1: TEE -->
+        <rect x="130" y="240" width="380" height="170" rx="12" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#4A1B0C" x="320" y="272"
+          text-anchor="middle" dominant-baseline="central">Lớp 1 — TEE / Secure Enclave (phần cứng)</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#712B13" x="320" y="290" text-anchor="middle"
+          dominant-baseline="central">ARM TrustZone · micro-kernel riêng · cô lập hoàn toàn khỏi OS</text>
+  
+        <!-- TEE inner boxes -->
+        <rect x="155" y="308" width="155" height="84" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="12" font-weight="600" fill="#2C2C2A" x="232" y="337"
+          text-anchor="middle" dominant-baseline="central">Khóa mật mã</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#5F5E5A" x="232" y="356" text-anchor="middle"
+          dominant-baseline="central">Private keys</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#5F5E5A" x="232" y="374" text-anchor="middle"
+          dominant-baseline="central">không rời chip</text>
+  
+        <rect x="330" y="308" width="155" height="84" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="12" font-weight="600" fill="#2C2C2A" x="407" y="337"
+          text-anchor="middle" dominant-baseline="central">Sinh trắc học</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#5F5E5A" x="407" y="356" text-anchor="middle"
+          dominant-baseline="central">Vân tay / Face ID</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#5F5E5A" x="407" y="374" text-anchor="middle"
+          dominant-baseline="central">lưu cục bộ</text>
+  
+        <!-- Mũi tên tấn công bị chặn ở lớp 2 -->
+        <line x1="635" y1="310" x2="548" y2="310" stroke="#E24B4A" stroke-width="1.5" stroke-dasharray="5 3"
+          marker-end="url(#arr2)" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#A32D2D" x="643" y="305"
+          dominant-baseline="central">Kẻ tấn</text>
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#A32D2D" x="643" y="320"
+          dominant-baseline="central">công</text>
+        <rect x="536" y="297" width="18" height="26" rx="4" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="12" font-weight="600" fill="#A32D2D" x="545" y="313"
+          text-anchor="middle" dominant-baseline="central">✕</text>
+  
+        <!-- Ghi chú dưới -->
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#888780" x="320" y="488" text-anchor="middle"
+          dominant-baseline="central">Ngay cả khi OS bị root/jailbreak, TEE vẫn bảo vệ khóa mã hóa và dữ liệu sinh trắc
+          học</text>
+  
+        <!-- Chú giải -->
+        <rect x="42" y="510" width="10" height="10" rx="2" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#0F6E56" x="58" y="518"
+          dominant-baseline="central">Quyền app</text>
+        <rect x="148" y="510" width="10" height="10" rx="2" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#185FA5" x="164" y="518"
+          dominant-baseline="central">Mã hóa</text>
+        <rect x="230" y="510" width="10" height="10" rx="2" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#3C3489" x="246" y="518"
+          dominant-baseline="central">Sandbox</text>
+        <rect x="314" y="510" width="10" height="10" rx="2" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5" />
+        <text font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#712B13" x="330" y="518"
+          dominant-baseline="central">TEE / phần cứng</text>
+      </svg>
+    </div>
+  
+    <!-- SECTION A: MDM Dashboard -->
+    <div class="crypto-section">
+      <h3>🖥️ MDM Dashboard — Quản lý thiết bị từ xa</h3>
+      <p class="section-sub">Mô phỏng giao diện IT Admin: giám sát thiết bị, push policy, remote lock và selective wipe
+      </p>
+  
+      <!-- Stat row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem">
+        <div style="background:var(--green-light);border-radius:var(--radius-md);padding:10px;text-align:center">
+          <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px">Tuân thủ</div>
+          <div id="mdm-stat-ok" style="font-size:24px;font-weight:600;color:var(--green)">0</div>
+        </div>
+        <div style="background:var(--amber-light);border-radius:var(--radius-md);padding:10px;text-align:center">
+          <div style="font-size:11px;color:var(--amber);font-weight:600;margin-bottom:2px">Cảnh báo</div>
+          <div id="mdm-stat-warn" style="font-size:24px;font-weight:600;color:var(--amber)">0</div>
+        </div>
+        <div style="background:var(--red-light);border-radius:var(--radius-md);padding:10px;text-align:center">
+          <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:2px">Vi phạm</div>
+          <div id="mdm-stat-fail" style="font-size:24px;font-weight:600;color:var(--red)">0</div>
+        </div>
+      </div>
+  
+      <!-- Device table -->
+      <div style="overflow-x:auto;border:0.5px solid var(--border);border-radius:var(--radius-md)">
+        <table style="width:100%;border-collapse:collapse;font-family:inherit">
+          <thead>
+            <tr style="background:var(--bg);border-bottom:0.5px solid var(--border)">
+              <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-muted)">Thiết bị
+                / Nhân viên</th>
+              <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-muted)">Hoạt
+                động</th>
+              <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-muted)">Trạng
+                thái</th>
+              <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-muted)">Chính
+                sách</th>
+              <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-muted)">Hành
+                động</th>
+            </tr>
+          </thead>
+          <tbody id="mdm-device-list"></tbody>
+        </table>
+      </div>
+  
+      <!-- MDM Action Log -->
+      <div
+        style="margin-top:10px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;min-height:48px"
+        id="mdm-log">
+        <div style="font-size:11px;color:var(--text-muted);font-style:italic">Log hành động sẽ xuất hiện ở đây khi bạn
+          nhấn Remote Wipe / Khóa / Push Policy...</div>
       </div>
     </div>
+<<<<<<< HEAD
 
     <!-- Lưới 8 thẻ tiêu chí — được tạo động bởi JS -->
     <div class="checks-grid" id="checks-grid"></div>
@@ -148,19 +568,105 @@
       </div>
     </div>
     <div id="toast-container"></div>
+=======
+  
+    <!-- SECTION B: BYOD Attack Scenario -->
+    <div class="crypto-section">
+      <h3>⚠️ Kịch bản BYOD — Thiết bị bị mất cắp</h3>
+      <p class="section-sub">Mô phỏng từng bước: từ lúc thiết bị bị mất đến khi IT phản ứng và bảo vệ dữ liệu doanh nghiệp
+      </p>
+  
+      <!-- Step display -->
+      <div id="byod-step-box" style="border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span id="byod-icon" style="font-size:28px"></span>
+          <div>
+            <div id="byod-step-num" style="font-size:11px;font-weight:600;color:var(--text-muted)"></div>
+            <div id="byod-step-title" style="font-size:15px;font-weight:600"></div>
+          </div>
+          <div id="byod-device-state" style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0">
+          </div>
+        </div>
+        <p id="byod-step-desc" style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:10px"></p>
+        <div id="byod-sys-response"
+          style="display:none;background:rgba(0,0,0,0.05);border-radius:4px;padding:8px 10px;font-size:11px;font-family:monospace;color:var(--text);line-height:1.6">
+        </div>
+      </div>
+  
+      <!-- Progress dots + controls -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div id="byod-dots" style="display:flex;gap:6px;flex:1"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="byod-prev-btn" class="btn" onclick="byodPrev()" style="flex:1">← Trước</button>
+        <button id="byod-next-btn" class="btn primary" onclick="byodNext()" style="flex:2">Tiếp →</button>
+      </div>
+>>>>>>> b1fc233 (Update new navigate and README.md)
     </div>
-
-    <!-- Terminal log -->
-    <div class="log-panel" id="log-panel"></div>
-
-  </div><!-- /.result-area -->
-
-</div><!-- /.app-shell -->
-
-<!-- ===== SCRIPTS ===== -->
-<!-- Tải data trước, sau đó mới tải logic -->
-<script src="data/devices.js"></script>
-<script src="js/scanner.js"></script>
+  
+    <!-- SECTION C: Containerization -->
+    <div class="crypto-section">
+      <h3>📦 Containerization — Tách vùng cá nhân & công ty</h3>
+      <p class="section-sub">Mô phỏng Work Profile: dữ liệu cá nhân và doanh nghiệp tách biệt hoàn toàn trên cùng một
+        thiết bị</p>
+  
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-bottom:12px">
+        <!-- Vùng cá nhân -->
+        <div>
+          <div
+            style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+            <span style="background:#EAF3DE;color:#3B6D11;padding:2px 8px;border-radius:99px;font-size:10px">Cá
+              nhân</span>
+            Không bị ảnh hưởng
+          </div>
+          <div id="container-personal-list"></div>
+        </div>
+  
+        <!-- Ranh giới -->
+        <div id="container-barrier" style="padding-top:40px"></div>
+  
+        <!-- Vùng công ty -->
+        <div>
+          <div
+            style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+            <span style="background:#E6F1FB;color:#0C447C;padding:2px 8px;border-radius:99px;font-size:10px">Work
+              Profile</span>
+            MDM kiểm soát
+          </div>
+          <div id="container-work-list"></div>
+        </div>
+      </div>
+  
+      <div style="display:flex;gap:8px">
+        <button id="container-wipe-btn" class="btn" onclick="containerSelectiveWipe()"
+          style="border-color:#E24B4A;color:#A32D2D">
+          🗑️ Thực hiện Selective Wipe
+        </button>
+        <button id="container-reset-btn" class="btn primary" onclick="containerReset()" style="display:none">
+          ↺ Khôi phục
+        </button>
+      </div>
+      <div id="container-wipe-result" style="display:none"></div>
+    </div>
+  
+  </div><!-- /#tab-crypto -->
+  
+  </div><!-- /.app-shell -->
+  
+  <script src="data/devices.js"></script>
+  <script src="js/scanner.js"></script>
+  <script src="js/mobile-demo.js"></script>
+  <script src="js/crypto-demo.js"></script>
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("tab-" + tabId).classList.add("active");
+      btn.classList.add("active");
+      if (tabId === "crypto") { initMobileTab(); initAttackDemo(); }
+    }
+  </script>
 
 </body>
+
 </html>

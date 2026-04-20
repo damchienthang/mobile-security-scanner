@@ -1,77 +1,162 @@
 # Mobile Security Scanner
-Demo báo cáo môn An toàn & Bảo mật HTTT — Nhóm 14
 
-## Cấu trúc thư mục
+**Demo môn: An toàn & Bảo mật Hệ thống Thông tin — Nhóm 14**
 
-```
+---
+
+## Giới thiệu
+
+Mobile Security Scanner là một **ứng dụng web mô phỏng đánh giá bảo mật thiết bị di động**, được xây dựng nhằm minh họa các nội dung:
+
+* Quản lý thiết bị di động (**MDM**)
+* Rủi ro **BYOD**
+* Mô hình **bảo mật đa lớp**
+* **Mã hóa (RSA + AES)**
+* **Xác thực đa yếu tố (MFA)**
+
+Ứng dụng không quét thật, mà **mô phỏng theo chuẩn thực tế (NIST + OWASP MASVS)**.
+
+---
+
+## Tính năng chính
+
+### 1. Security Scanner (Chương 2)
+
+* Quét 8 tiêu chí bảo mật:
+
+  * Màn hình khóa
+  * Mã hóa ổ đĩa
+  * Kết nối mạng
+  * Cập nhật hệ thống
+  * Quyền ứng dụng
+  * MDM / Chính sách
+  * MFA
+  * Bluetooth / NFC
+
+* Hiển thị:
+
+  * Điểm bảo mật (0–100)
+  * Mức rủi ro
+  * Log kỹ thuật dạng terminal
+  * Chi tiết từng tiêu chí
+
+Logic nằm trong: `scanner.js` 
+
+---
+
+### 2. Attack Simulation (Demo nâng cao)
+
+Cho phép mô phỏng tấn công:
+
+* MITM (Wi-Fi giả mạo)
+* SMS Phishing
+* Malware ẩn
+ Dùng để minh họa **rủi ro thực tế BYOD**
+
+---
+
+### 3. MDM Dashboard
+
+* Quản lý nhiều thiết bị
+* Trạng thái: compliant / warning / non-comply
+* Thao tác:
+
+  * Remote wipe
+  * Lock device
+  * Push policy
+
+ Logic: `mobile-demo.js` 
+
+---
+
+### 4. Crypto Demo (Chương 3)
+
+Mô phỏng:
+
+#### RSA + AES Key Exchange
+
+* Server tạo RSA key
+* Device tạo AES session key
+* Mã hóa bằng RSA
+* Truyền dữ liệu bằng AES
+
+#### MFA Authentication
+
+* OTP (TOTP)
+* Passkey (FIDO2)
+
+ Logic: `crypto-demo.js` 
+
+---
+
+### 5. Kiến trúc bảo mật đa lớp
+
+Hiển thị mô hình:
+
+* App Permissions
+* Sandbox
+* Encryption
+* Trusted Execution Environment (TEE)
+
+---
+
+## Thiết bị mô phỏng
+
+| Thiết bị        | OS         | Điểm | Mức        |
+| --------------- | ---------- | ---- | ---------- |
+| iPhone 15 Pro   | iOS 17.4   | 92   | Thấp       |
+| Samsung A55     | Android 14 | 70   | Trung bình |
+| Xiaomi Redmi 12 | Android 13 | 38   | Cao        |
+
+ Data: `devices.js` 
+
+
+
+## Cấu trúc project
+
 mobile-security-scanner/
 │
-├── index.html          ← Mở file này trên trình duyệt để chạy demo
-│
+├── index.html        ← Giao diện chính
 ├── css/
-│   └── style.css       ← Toàn bộ giao diện, màu sắc, responsive
-│
+│   └── style.css     ← UI/UX
 ├── js/
-│   └── scanner.js      ← Logic: chọn thiết bị, animation quét, vẽ kết quả
+│   ├── scanner.js    ← Logic quét
+│   ├── mobile-demo.js← MDM + BYOD
+│   ├── crypto-demo.js← RSA + MFA
 │
 └── data/
-    └── devices.js      ← Dữ liệu 3 thiết bị (điểm, tiêu chí, log)
-```
+    └── devices.js    ← Dữ liệu thiết bị
 
-## Cách chạy
 
-Chỉ cần mở `index.html` bằng trình duyệt (Chrome, Firefox, Edge).
-Không cần cài thêm gì, không cần server, không cần internet.
 
-## Cách thêm thiết bị mới
+##  Cách chạy
 
-Mở `data/devices.js` và thêm một key mới vào object `DEVICES`:
+* Mở file `index.html`
+* Không cần server
+* Không cần backend
 
-```js
-DEVICES.myDevice = {
-  name: "Tên thiết bị",
-  os: "Android 14 · BYOD",
-  score: 55,
-  checks: [
-    {
-      icon: "🔒",
-      title: "Màn hình khóa",
-      level: "pass",          // pass | warn | fail
-      desc: "Mô tả ngắn",
-      detail: "Giải thích chi tiết khi người dùng click vào thẻ",
-    },
-    // ... thêm tối đa 8 tiêu chí
-  ],
-  logLines: [
-    { cls: "info", text: "[09:31:00] Bắt đầu quét..." },
-    { cls: "ok",   text: "[09:31:01] PASS  Màn hình khóa OK" },
-    { cls: "fail", text: "[09:31:02] FAIL  Mã hóa chưa bật" },
-  ],
-};
-```
 
-Sau đó thêm nút trong `index.html`:
+## Liên hệ với báo cáo
 
-```html
-<button class="device-btn" onclick="selectDevice(this, 'myDevice')">
-  <div class="db-name">Tên thiết bị</div>
-  <div class="db-os">Android 14 · BYOD</div>
-</button>
-```
+| Demo              | Nội dung                |
+| ----------------- | ----------------------- |
+| Scanner           | Chương 2 – BYOD + MDM   |
+| MDM Dashboard     | Quản lý thiết bị        |
+| Attack Simulation | Rủi ro thực tế          |
+| Crypto Demo       | Chương 3 – Mã hóa & MFA |
+| Architecture      | Bảo mật đa lớp          |
 
-## Liên kết với nội dung báo cáo
 
-| Thiết bị          | Điểm | Minh họa nội dung báo cáo                          |
-|-------------------|------|----------------------------------------------------|
-| iPhone 15 Pro     |  92  | Chương 3: Mã hóa phần cứng Secure Enclave, Passkey |
-| Samsung Galaxy A55|  70  | Chương 2: Rủi ro BYOD, MDM Intune, MFA             |
-| Xiaomi Redmi 12   |  38  | Chương 2: Thiết bị unmanaged, tấn công phổ biến    |
+##  Nhóm thực hiện
 
-## Nhóm thực hiện
+* Đàm Chiến Thắng
+* Trần Duy Đông
+* Trần Tiến Dũng
+* Nguyễn Mạnh Tuyển
 
-| Họ tên            | MSV        | Phụ trách                |
-|-------------------|------------|--------------------------|
-| Đàm Chiến Thắng   | B23DCKH106 | Demo, kiến trúc bảo mật  |
-| Trần Duy Đông     | B23DCKH025 | Demo, kiến trúc MDM      |
-| Trần Tiến Dũng    | B23DCKH033 | Slide, rủi ro BYOD       |
-| Nguyễn Mạnh Tuyển | B23DCKH132 | Điểm yếu, ứng dụng thực tiễn |
+
+
+## Ghi chú
+
+Đây là hệ thống demo phục vụ học tập, **không phải công cụ bảo mật thực tế**.
+
