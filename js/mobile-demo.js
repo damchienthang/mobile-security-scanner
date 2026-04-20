@@ -102,7 +102,7 @@ function addMdmLog(type, text) {
 const BYOD_STEPS = [
   {
     title: "Thiết bị bị mất / đánh cắp",
-    icon: "😱",
+    icon: "📱",
     actor: "threat",
     desc: "Nhân viên báo mất điện thoại công ty (Samsung A55) tại quán cà phê. Thiết bị có Work Profile chứa email và tài liệu doanh nghiệp.",
     sysResponse: null,
